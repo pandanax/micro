@@ -1,0 +1,29 @@
+meta {
+  name: create
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/cats
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Vasya",
+    "age": 3,
+    "breed": "Russian Blue"
+  }
+}
+
+body:multipart-form {
+  name: Vasya
+  age: 2
+  breed: weeed
+}
