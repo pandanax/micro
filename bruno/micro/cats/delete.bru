@@ -1,0 +1,27 @@
+meta {
+  name: delete
+  type: http
+  seq: 5
+}
+
+delete {
+  url: http://localhost:3000/cats/2
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {  
+    "age": 3
+  }
+}
+
+body:multipart-form {
+  name: Vasya
+  age: 2
+  breed: weeed
+}

@@ -1,0 +1,15 @@
+meta {
+  name: findById
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:3000/cats/1
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
