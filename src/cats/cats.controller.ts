@@ -10,12 +10,15 @@ import {
   Put,
   Delete,
 } from '@nestjs/common';
-import { CreateCatDto } from './create-cat.dto';
-import { ListAllEntities } from './list-cat.dto';
-import { UpdateCatDto } from './update-cat.dto';
+import { CreateCatDto } from './dto/create-cat.dto';
+import { ListAllEntities } from './dto/list-cat.dto';
+import { UpdateCatDto } from './dto/update-cat.dto';
+import { CatsService } from './cats.service';
 
 @Controller('cats')
 export class CatsController {
+  constructor(private catsService: CatsService) {}
+
   @Get('redirect')
   @Redirect('https://docs.nestjs.com', 302)
   getDocs(@Query('version') version) {
@@ -27,6 +30,8 @@ export class CatsController {
   // @HttpCode(204)
   @Header('X-Micro', 'test')
   async create(@Body() createCatDto: CreateCatDto) {
+    const res = this.catsService.create(createCatDto);
+    console.log('----res', res);
     return {
       result: `This action has creates a "${createCatDto.name}" cat`,
     };
@@ -34,9 +39,11 @@ export class CatsController {
 
   @Get()
   findAll(@Query() query: ListAllEntities) {
-    return {
+    return this.catsService.findAll();
+
+    /*return {
       result: `This action returns all cats (limit: ${query.limit} items)`,
-    };
+    };*/
   }
 
   @Get(':id')
