@@ -30,8 +30,7 @@ export class CatsController {
   // @HttpCode(204)
   @Header('X-Micro', 'test')
   async create(@Body() createCatDto: CreateCatDto) {
-    const res = this.catsService.create(createCatDto);
-    console.log('----res', res);
+    this.catsService.create(createCatDto);
     return {
       result: `This action has creates a "${createCatDto.name}" cat`,
     };

@@ -1,3 +1,3 @@
 export class UpdateCatDto {
-  age: number | undefined;
+  age: number;
 }
