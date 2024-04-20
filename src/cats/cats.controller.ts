@@ -1,92 +1,125 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Header,
-  Redirect,
-  Query,
-  Param,
-  Body,
-  Put,
-  Delete,
-  HttpException,
-  HttpStatus,
-  ForbiddenException,
-  BadRequestException,
-  UseFilters,
+    Controller,
+    Get,
+    Post,
+    Header,
+    Redirect,
+    Query,
+    Param,
+    Body,
+    Put,
+    Delete,
+    UseFilters,
+    UsePipes,
+    HttpException,
+    HttpStatus,
+    ForbiddenException,
+    BadRequestException,
+    ParseIntPipe,
+    NotFoundException,
 } from '@nestjs/common';
-import { CreateCatDto } from './dto/create-cat.dto';
-import { ListAllEntities } from './dto/list-cat.dto';
-import { UpdateCatDto } from './dto/update-cat.dto';
-import { CatsService } from './cats.service';
-import {HttpExceptionFilter} from "../common/http/exception/http-exception.filter";
+import {CreateCatDto, createCatSchema} from './dto/create-cat.dto';
+import {UpdateCatDto, updateCatSchema} from './dto/update-cat.dto';
+import {CatsService} from './cats.service';
+import {HttpExceptionFilter} from "../common/filters/http-exception.filter";
+import {CatId} from "./interfaces/cat.interface";
+import {ValidationPipe} from "./pipes/validation.pipe";
 
 @Controller('cats')
-// @UseFilters(new HttpExceptionFilter())
+@UseFilters(new HttpExceptionFilter())
 export class CatsController {
-  constructor(private catsService: CatsService) {}
-
-  @Get('redirect')
-  @Redirect('https://docs.nestjs.com', 302)
-  getDocs(@Query('version') version) {
-    if (version && version === '5') {
-      return { url: 'https://docs.nestjs.com/v5/' };
+    constructor(private catsService: CatsService) {
     }
-  }
-  @Post()
-  // @HttpCode(204)
-  @Header('X-Micro', 'test')
-  async create(@Body() createCatDto: CreateCatDto) {
-    this.catsService.create(createCatDto);
-    return {
-      result: `This action has creates a "${createCatDto.name}" cat`,
-    };
-  }
 
-  @Post('bad')
-  @UseFilters(new HttpExceptionFilter())
-  async createBad(@Body() createCatDto: CreateCatDto) {
-    throw new ForbiddenException();
-  }
-
-  @Get()
-  async findAll(@Query() query: ListAllEntities) {
-    try {
-      return this.catsService.findAll();
-    } catch (error) {
-      throw new HttpException({
-        status: HttpStatus.FORBIDDEN,
-        error: 'This is a custom message',
-      }, HttpStatus.FORBIDDEN, {
-        cause: error
-      });
+    // создает кота имеет пользовательский хедер в ответе
+    @Post()
+    // @HttpCode(204)
+    @Header('X-Micro', 'test')
+    @UsePipes(new ValidationPipe(createCatSchema))
+    async create(@Body() createCatDto: CreateCatDto) {
+        return this.catsService.create(createCatDto);
     }
-  }
 
-  @Get('exception')
-  exception() {
-    throw new ForbiddenException();
-  }
 
-  @Get('bad')
-  bad() {
-    throw new BadRequestException('Something bad happened', { cause: new Error(), description: 'Some error description' })
-  }
+    // пытается найти кота при исключении обрабатывает ошибку вручную
+    @Get()
+    async findAll(@Query('limit', new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) limit: number) {
+        try {
+            return this.catsService.findAll({limit});
+        } catch (error) {
+            throw new HttpException({
+                status: HttpStatus.FORBIDDEN,
+                error: 'This is a custom message',
+            }, HttpStatus.FORBIDDEN, {
+                cause: error
+            });
+        }
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return { result: `This action returns a #${id} cat` };
-  }
+    // находит кота
+    @Get(':id')
+    async findOne(@Param('id', new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id: CatId) {
+        const cat = this.catsService.findOne(id);
+        if (!cat) {
+            throw new NotFoundException();
+        }
+        return cat;
+    }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateCatDto: UpdateCatDto) {
-    return {
-      result: `This action updates a #${id} cat with age ${updateCatDto.age}`,
-    };
-  }
+    // апдэйтит кота
+    @Put(':id')
+    @UsePipes(new ValidationPipe(updateCatSchema))
+    update(
+        @Param('id', new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id: CatId,
+        @Body() updateCatDto: UpdateCatDto
+    ) {
+        const cat = this.catsService.updateOne(id, updateCatDto);
+        if (!cat) {
+            throw new NotFoundException();
+        }
+        return cat;
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return { result: `This action removes a #${id} cat` };
-  }
+    // удаляет кота
+    @Delete(':id')
+    remove(@Param('id', new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id: CatId) {
+        const cat = this.catsService.deleteOne(id);
+        if (!cat) {
+            throw new NotFoundException();
+        }
+        return cat;
+    }
+
+
+    // BAD
+    // всегда выбрасывает ошибку
+    @Post('bad')
+    // @UseFilters(new HttpExceptionFilter()) // фильтры можно крепить к конкретному запросу
+    async createBad(@Body() createCatDto: CreateCatDto) {
+        throw new ForbiddenException();
+    }
+
+    // тупо выкидывает ошибку
+    @Get('exception')
+    exception() {
+        throw new ForbiddenException();
+    }
+
+    // тоже тупо выкидывает ошибку
+    @Get('bad')
+    bad() {
+        throw new BadRequestException('Something bad happened', {
+            cause: new Error(),
+            description: 'Some error description'
+        })
+    }
+
+    // редиректит на нужный урл
+    @Get('redirect')
+    @Redirect('https://docs.nestjs.com', 302)
+    getDocs(@Query('version') version) {
+        if (version && version === '5') {
+            return {url: 'https://docs.nestjs.com/v5/'};
+        }
+    }
 }
