@@ -1,11 +1,11 @@
 meta {
-  name: update
+  name: createBad
   type: http
-  seq: 4
+  seq: 8
 }
 
-put {
-  url: http://localhost:3000/cats/1
+post {
+  url: http://localhost:3000/cats/bad
   body: json
   auth: none
 }
@@ -15,8 +15,10 @@ headers {
 }
 
 body:json {
-  {  
-    "age": 3
+  {
+    "name": "Vasya2",
+    "age": 5,
+    "breed": "Russian Blue"
   }
 }
 
