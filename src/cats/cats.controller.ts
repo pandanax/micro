@@ -11,6 +11,8 @@ import {
     Delete,
     UseFilters,
     UsePipes,
+    UseGuards,
+    UseInterceptors,
     HttpException,
     HttpStatus,
     ForbiddenException,
@@ -24,9 +26,14 @@ import {CatsService} from './cats.service';
 import {HttpExceptionFilter} from "../common/filters/http-exception.filter";
 import {CatId} from "./interfaces/cat.interface";
 import {ValidationPipe} from "./pipes/validation.pipe";
+import {RolesGuard} from "../common/guard/roles.guard";
+import {Role, Roles} from "../common/decorators/roles.decorator";
+import {LoggingInterceptor} from "../common/interceptors/logging.interceptor";
+import {Auth} from "../common/decorators/auth.decorator";
 
 @Controller('cats')
 @UseFilters(new HttpExceptionFilter())
+@UseGuards(RolesGuard)
 export class CatsController {
     constructor(private catsService: CatsService) {
     }
@@ -36,6 +43,9 @@ export class CatsController {
     // @HttpCode(204)
     @Header('X-Micro', 'test')
     @UsePipes(new ValidationPipe(createCatSchema))
+    @Roles([Role.admin])
+    @Auth()
+    @UseInterceptors(LoggingInterceptor)
     async create(@Body() createCatDto: CreateCatDto) {
         return this.catsService.create(createCatDto);
     }

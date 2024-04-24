@@ -14,6 +14,8 @@ import {CatsController} from "./cats/cats.controller";
       /*{
         provide: APP_FILTER,
         useClass: HttpExceptionFilter,
+        useClass: LoggingInterceptor,
+        // все можно подключать глобально пайпы, гварды, интерцепторы и т д
       }*/
   ],
 })
