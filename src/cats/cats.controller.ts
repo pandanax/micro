@@ -13,6 +13,7 @@ import {
     UsePipes,
     UseGuards,
     UseInterceptors,
+    Inject,
     HttpException,
     HttpStatus,
     ForbiddenException,
@@ -30,12 +31,21 @@ import {RolesGuard} from "../common/guard/roles.guard";
 import {Role, Roles} from "../common/decorators/roles.decorator";
 import {LoggingInterceptor} from "../common/interceptors/logging.interceptor";
 import {Auth} from "../common/decorators/auth.decorator";
+import {LoggerService} from "../common/provider/logger.provider";
+import {Connection} from "../common/providerFactory/async.provider.factory";
 
 @Controller('cats')
 @UseFilters(new HttpExceptionFilter())
 @UseGuards(RolesGuard)
+
 export class CatsController {
-    constructor(private catsService: CatsService) {
+
+    constructor(
+        private catsService: CatsService,
+        private logger: LoggerService,
+        @Inject('ASYNC_CONNECTION')
+        private connection: Connection,
+    ) {
     }
 
     // создает кота имеет пользовательский хедер в ответе
@@ -47,6 +57,8 @@ export class CatsController {
     @Auth()
     @UseInterceptors(LoggingInterceptor)
     async create(@Body() createCatDto: CreateCatDto) {
+        this.logger.log(createCatDto);
+        this.logger.log(this.connection);
         return this.catsService.create(createCatDto);
     }
 

@@ -11,14 +11,9 @@ import {CatsController} from "./cats/cats.controller";
   controllers: [AppController],
   providers: [
       AppService,
-      /*{
-        provide: APP_FILTER,
-        useClass: HttpExceptionFilter,
-        useClass: LoggingInterceptor,
-        // все можно подключать глобально пайпы, гварды, интерцепторы и т д
-      }*/
   ],
 })
+
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
