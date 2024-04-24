@@ -2,8 +2,7 @@ import {Injectable} from "@nestjs/common";
 
 @Injectable()
 export class LoggerService {
-    constructor() {
-    }
+    constructor() {}
 
     log(...args) {
         console.info(new Date(), ...args)
