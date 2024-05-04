@@ -33,6 +33,7 @@ import {LoggingInterceptor} from "../common/interceptors/logging.interceptor";
 import {Auth} from "../common/decorators/auth.decorator";
 import {LoggerService} from "../common/provider/logger.provider";
 import {Connection} from "../common/providerFactory/async.provider.factory";
+import {ConfigService} from "@nestjs/config";
 
 @Controller('cats')
 @UseFilters(new HttpExceptionFilter())
@@ -45,6 +46,7 @@ export class CatsController {
         private logger: LoggerService,
         @Inject('ASYNC_CONNECTION')
         private connection: Connection,
+        private configService: ConfigService,
     ) {
     }
 
@@ -59,6 +61,7 @@ export class CatsController {
     async create(@Body() createCatDto: CreateCatDto) {
         this.logger.log(createCatDto);
         this.logger.log(this.connection);
+        console.log('---configService', this.configService.get<string>('database.user'))
         return this.catsService.create(createCatDto);
     }
 
