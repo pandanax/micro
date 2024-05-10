@@ -6,9 +6,10 @@ import {AppService} from './app.service';
 import {CatsModule} from "./cats/cats.module";
 import {LoggerMiddleware} from './common/middleware/logger.middleware';
 import {CatsController} from "./cats/cats.controller";
+import {CronModule} from "./cron/cron.module";
 
 @Module({
-    imports: [CatsModule],
+    imports: [CatsModule, CronModule],
     controllers: [AppController],
     providers: [
         AppService,
