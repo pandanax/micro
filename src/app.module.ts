@@ -1,18 +1,21 @@
 import {Module, NestModule, MiddlewareConsumer, RequestMethod} from '@nestjs/common';
-import {ConfigService} from '@nestjs/config';
 
 import {AppController} from './app.controller';
 import {AppService} from './app.service';
 import {CatsModule} from "./cats/cats.module";
 import {LoggerMiddleware} from './common/middleware/logger.middleware';
 import {CatsController} from "./cats/cats.controller";
+import { MongooseModule } from '@nestjs/mongoose';
+import * as process from "process";
 
 @Module({
-    imports: [CatsModule],
+    imports: [
+        MongooseModule.forRoot(process.env.DATABASE_URI),
+        CatsModule
+    ],
     controllers: [AppController],
     providers: [
         AppService,
-        ConfigService,
     ],
 })
 

@@ -1,46 +1,37 @@
+import { Model } from 'mongoose';
+
 import { Injectable } from '@nestjs/common';
-import {Cat, CatId} from './interfaces/cat.interface';
-import {ListCat} from "./interfaces/list-cat.interface";
+import { InjectModel } from '@nestjs/mongoose';
+
 import {CreateCatDto} from "./dto/create-cat.dto";
+import { Cat } from './cats.schema';
 import {UpdateCatDto} from "./dto/update-cat.dto";
 
 @Injectable()
 export class CatsService {
-    private readonly cats: Cat[] = [];
-    private index: number = 1;
+    constructor(@InjectModel(Cat.name) private catModel: Model<Cat>) {}
 
-    create(cat: CreateCatDto): Cat {
-        const newCat = {
-            ...cat,
-            id: this.index++,
-        };
-        this.cats.push(newCat);
-        return newCat;
+    create(createCatDto: CreateCatDto): Promise<Cat> {
+        const createdCat = new this.catModel(createCatDto);
+        return createdCat.save();
+    }
+    update(id: string, updateCatSchema: UpdateCatDto): Promise<Cat> {
+        return  this.catModel
+            .findByIdAndUpdate(id, updateCatSchema)
+            .exec();
     }
 
-    findAll({limit}: ListCat): Cat[] {
-        return this.cats.filter((_, i) => i < Number(limit));
+    findAll(limit: number): Promise<Cat[]> {
+        return this.catModel.find().limit(limit).exec();
     }
 
-    findOne(catId: CatId): Cat {
-        return this.cats.find(({id}) => id === catId );
+    findOne(id: string): Promise<Cat> {
+        return this.catModel.findOne({ _id: id }).exec();
     }
 
-    updateOne(catId: CatId, catData: UpdateCatDto): Cat | null {
-        const index = this.cats.findIndex(({id}) => id === catId );
-        if (index > -1) {
-            Object.assign(this.cats[index], catData);
-            return this.cats[index];
-        }
-        return null;
-    }
-
-    deleteOne(catId: CatId): Cat | null {
-        const index = this.cats.findIndex(({id}) => id === catId );
-        if (index > -1) {
-            const dCats = this.cats.splice(index, 1);
-            return dCats.at(0);
-        }
-        return null;
+    delete(id: string): Promise<Cat> {
+        return this.catModel
+            .findByIdAndDelete({ _id: id })
+            .exec();
     }
 }
