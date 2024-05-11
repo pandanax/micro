@@ -1,15 +1,31 @@
 import { Injectable } from '@nestjs/common';
-import {Cat, CatId} from './interfaces/cat.interface';
+import { CatId} from './interfaces/cat.interface';
 import {ListCat} from "./interfaces/list-cat.interface";
 import {CreateCatDto} from "./dto/create-cat.dto";
 import {UpdateCatDto} from "./dto/update-cat.dto";
+import { Cat } from './cats.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+
 
 @Injectable()
 export class CatsService {
     private readonly cats: Cat[] = [];
     private index: number = 1;
 
-    create(cat: CreateCatDto): Cat {
+    constructor(@InjectModel(Cat.name) private catModel: Model<Cat>) {}
+
+    async create(createCatDto: CreateCatDto): Promise<Cat> {
+        const createdCat = new this.catModel(createCatDto);
+        return createdCat.save();
+    }
+
+    async findAll(): Promise<Cat[]> {
+        return this.catModel.find().exec();
+    }
+
+
+    /*create(cat: CreateCatDto): Cat {
         const newCat = {
             ...cat,
             id: this.index++,
@@ -20,9 +36,9 @@ export class CatsService {
 
     findAll({limit}: ListCat): Cat[] {
         return this.cats.filter((_, i) => i < Number(limit));
-    }
+    }*/
 
-    findOne(catId: CatId): Cat {
+    /*findOne(catId: CatId): Cat {
         return this.cats.find(({id}) => id === catId );
     }
 
@@ -42,5 +58,5 @@ export class CatsService {
             return dCats.at(0);
         }
         return null;
-    }
+    }*/
 }

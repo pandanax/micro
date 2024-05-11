@@ -53,11 +53,11 @@ export class CatsController {
     // создает кота имеет пользовательский хедер в ответе
     @Post()
     // @HttpCode(204)
-    @Header('X-Micro', 'test')
-    @UsePipes(new ValidationPipe(createCatSchema))
-    @Roles([Role.admin])
-    @Auth()
-    @UseInterceptors(LoggingInterceptor)
+   // @Header('X-Micro', 'test')
+   // @UsePipes(new ValidationPipe(createCatSchema))
+  //  @Roles([Role.admin])
+  //  @Auth()
+  //  @UseInterceptors(LoggingInterceptor)
     async create(@Body() createCatDto: CreateCatDto) {
         this.logger.log(createCatDto);
         this.logger.log(this.connection);
@@ -70,7 +70,8 @@ export class CatsController {
     @Get()
     async findAll(@Query('limit', new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) limit: number) {
         try {
-            return this.catsService.findAll({limit});
+            //return this.catsService.findAll({limit});
+            return this.catsService.findAll();
         } catch (error) {
             throw new HttpException({
                 status: HttpStatus.FORBIDDEN,
@@ -82,7 +83,7 @@ export class CatsController {
     }
 
     // находит кота
-    @Get(':id')
+    /*@Get(':id')
     async findOne(@Param('id', new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id: CatId) {
         const cat = this.catsService.findOne(id);
         if (!cat) {
@@ -113,7 +114,7 @@ export class CatsController {
             throw new NotFoundException();
         }
         return cat;
-    }
+    }*/
 
 
     // BAD

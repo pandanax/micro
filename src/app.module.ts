@@ -6,9 +6,10 @@ import {AppService} from './app.service';
 import {CatsModule} from "./cats/cats.module";
 import {LoggerMiddleware} from './common/middleware/logger.middleware';
 import {CatsController} from "./cats/cats.controller";
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
-    imports: [CatsModule],
+    imports: [CatsModule, MongooseModule.forRoot('mongodb://username:password@localhost:27017/test')],
     controllers: [AppController],
     providers: [
         AppService,
