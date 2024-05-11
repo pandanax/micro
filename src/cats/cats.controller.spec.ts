@@ -1,27 +1,89 @@
+import { Test, TestingModule } from '@nestjs/testing';
 import { CatsController } from './cats.controller';
+import { CreateCatDto } from './dto/create-cat.dto';
 import { CatsService } from './cats.service';
-import {LoggerService} from "../common/provider/logger.provider";
-import {Connection} from "../common/providerFactory/async.provider.factory";
-import {ConfigService} from "@nestjs/config";
 
-describe('CatsController', () => {
-    let catsController: CatsController;
-    let catsService: CatsService;
-    let loggerService: LoggerService;
-    let connection: Connection;
-    let configService: ConfigService;
+describe('Cats Controller', () => {
+    let controller: CatsController;
+    let service: CatsService;
+    const createCatDto: CreateCatDto = {
+        name: 'Cat #1',
+        breed: 'Breed #1',
+        age: 4,
+    };
 
-    beforeEach(() => {
-        catsService = new CatsService();
-        catsController = new CatsController(catsService, loggerService, connection, configService);
+    const mockCat = {
+        name: 'Cat #1',
+        breed: 'Breed #1',
+        age: 4,
+        _id: 'a id',
+    };
+
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            controllers: [CatsController],
+            providers: [
+                {
+                    provide: CatsService,
+                    useValue: {
+                        findAll: jest.fn().mockResolvedValue([
+                            {
+                                name: 'Cat #1',
+                                breed: 'Bread #1',
+                                age: 4,
+                            },
+                            {
+                                name: 'Cat #2',
+                                breed: 'Breed #2',
+                                age: 3,
+                            },
+                            {
+                                name: 'Cat #3',
+                                breed: 'Breed #3',
+                                age: 2,
+                            },
+                        ]),
+                        create: jest.fn().mockResolvedValue(createCatDto),
+                    },
+                },
+            ],
+        }).compile();
+
+        controller = module.get<CatsController>(CatsController);
+        service = module.get<CatsService>(CatsService);
     });
 
-    describe('findAll', () => {
-        it('should return an array of cats', async () => {
-            const result = [{id: 1}];
-            jest.spyOn(catsService, 'findAll').mockImplementation(() => result);
+    describe('create()', () => {
+        it('should create a new cat', async () => {
+            const createSpy = jest
+                .spyOn(service, 'create')
+                .mockResolvedValueOnce(mockCat);
 
-            expect(await catsController.findAll(5)).toBe(result);
+            await controller.create(createCatDto);
+            expect(createSpy).toHaveBeenCalledWith(createCatDto);
+        });
+    });
+
+    describe('findAll()', () => {
+        it('should return an array of cats', async () => {
+            expect(controller.findAll(3)).resolves.toEqual([
+                {
+                    name: 'Cat #1',
+                    breed: 'Bread #1',
+                    age: 4,
+                },
+                {
+                    name: 'Cat #2',
+                    breed: 'Breed #2',
+                    age: 3,
+                },
+                {
+                    name: 'Cat #3',
+                    breed: 'Breed #3',
+                    age: 2,
+                },
+            ]);
+            expect(service.findAll).toHaveBeenCalled();
         });
     });
 });
