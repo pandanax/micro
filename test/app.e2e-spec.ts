@@ -6,6 +6,7 @@ import { AppModule } from '../src/app.module';
 
 jest.doMock(require.resolve('@nestjs/mongoose'), jest.fn().mockReturnValue({
   forRoot: jest.fn(),
+  forFeature: jest.fn(),
 }));
 
 describe('AppController (e2e)', () => {
