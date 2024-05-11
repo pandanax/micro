@@ -3,8 +3,14 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 
+
+jest.doMock(require.resolve('@nestjs/mongoose'), jest.fn().mockReturnValue({
+  forRoot: jest.fn(),
+}));
+
 describe('AppController (e2e)', () => {
   let app: INestApplication;
+
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
