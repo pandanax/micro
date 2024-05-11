@@ -5,6 +5,8 @@ import { AppService } from './app.service';
 describe('AppController', () => {
   let appController: AppController;
 
+  jest.doMock(require.resolve('@nestjs/mongoose'), jest.fn());
+
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
