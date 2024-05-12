@@ -1,30 +1,25 @@
 import {
-    Controller,
-    Get,
-    Post,
-    Delete,
-    Query,
     Body,
-    UseFilters,
-    UseGuards,
-    Param,
-    Put,
+    Controller,
+    Delete,
+    Get,
     HttpStatus,
-    NotFoundException,
     InternalServerErrorException,
+    NotFoundException,
+    Param,
     ParseIntPipe,
+    Post,
+    Put,
+    Query,
 } from '@nestjs/common';
 import {CreateCatDto} from './dto/create-cat.dto';
 import {CatsService} from './cats.service';
-import {HttpExceptionFilter} from "../common/filters/http-exception.filter";
-import {RolesGuard} from "../common/guard/roles.guard";
-import { Cat } from './cats.schema';
+import {Cat} from './cats.schema';
 import {UpdateCatDto} from "./dto/update-cat.dto";
+import {Roles} from "../roles/roles.decorator";
+import {Role} from "../roles/roles.types";
 
 @Controller('cats')
-@UseFilters(new HttpExceptionFilter())
-@UseGuards(RolesGuard)
-
 export class CatsController {
 
     constructor(
@@ -69,6 +64,7 @@ export class CatsController {
     }
 
     // удалить кота
+    @Roles([Role.admin])
     @Delete(':id')
     async delete(@Param('id') id: string): Promise<Cat> {
         let deletedCat;
@@ -85,6 +81,7 @@ export class CatsController {
 
 
     // апдэйтит кота
+    @Roles([Role.admin])
     @Put(':id')
     //@UsePipes(new ValidationPipe(updateCatSchema))
     async update(

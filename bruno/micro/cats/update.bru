@@ -5,18 +5,20 @@ meta {
 }
 
 put {
-  url: http://localhost:3000/cats/663fdf90965591bbccd34b0c
+  url: http://localhost:3000/cats/663fcce390c0f50cadc74255
   body: json
   auth: none
 }
 
 headers {
   Content-Type: application/json
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InBhbmRhbmF4Iiwicm9sZSI6InVzZXIiLCJfaWQiOiI2NjQwZTYzOTJkMGFhYWZmMzljYmRlNjMiLCJpYXQiOjE3MTU1MzE3NzUsImV4cCI6MTcxNTYxODE3NX0.1HbjKykHZ6yc9fJoa-dA9Lil9nN7vkP0MvwDigQDei8
 }
 
 body:json {
-  {    
-    "breed": "Russian Blue"
+  {
+    "name": "Napoleon2",
+    "breed": "Snow Shoe"
   }
 }
 
