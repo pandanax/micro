@@ -5,15 +5,16 @@ meta {
 }
 
 get {
-  url: http://localhost:3000/cats?limit=a
+  url: http://localhost:3000/cats?limit=-1
   body: none
   auth: none
 }
 
 query {
-  limit: a
+  limit: -1
 }
 
 headers {
   Content-Type: application/json
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiNjY0MGU2MjQyZDBhYWFmZjM5Y2JkZTVmIiwiaWF0IjoxNzE1NTI5MzA4LCJleHAiOjE3MTU2MTU3MDh9.-mXKLa2aUxRQJTq2fIfx8X8hRa2eY3rAAFbYKRgbSYI
 }
